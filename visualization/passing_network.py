@@ -168,26 +168,28 @@ def draw_pass_map(ax, player_position,
         # Combine num_passes and pass_value columns into one DataFrame
         pair_stats = pd.merge(pair_pass_count, pair_pass_value, left_index=True, right_index=True)
         for pair_key, row in pair_stats.iterrows():
-            player1, player2 = pair_key.split("_")
+            try:
+                player1, player2 = pair_key.split("_")
 
-            player1_x = player_position.loc[player1]["origin_pos_x"]
-            player1_y = player_position.loc[player1]["origin_pos_y"]
+                player1_x = player_position.loc[player1]["origin_pos_x"]
+                player1_y = player_position.loc[player1]["origin_pos_y"]
 
-            player2_x = player_position.loc[player2]["origin_pos_x"]
-            player2_y = player_position.loc[player2]["origin_pos_y"]
+                player2_x = player_position.loc[player2]["origin_pos_x"]
+                player2_y = player_position.loc[player2]["origin_pos_y"]
 
-            num_passes = row["num_passes"]
-            pass_value = row["pass_value"]
-            if num_passes > 15:
-                line_width = _change_range(num_passes, (0, max_pair_count), (config["min_edge_width"], config["max_edge_width"]))
-                norm = Normalize(vmin=0, vmax=max_pair_value)
-                edge_cmap = cm.get_cmap(config["nodes_cmap"])
-                # edge_cmap = cm.get_cmap("nodes_cmap")
-                edge_color = edge_cmap(norm(pass_value))
+                num_passes = row["num_passes"]
+                pass_value = row["pass_value"]
+                if num_passes > 0:
+                    line_width = _change_range(num_passes, (0, max_pair_count), (config["min_edge_width"], config["max_edge_width"]))
+                    norm = Normalize(vmin=0, vmax=max_pair_value)
+                    edge_cmap = cm.get_cmap(config["nodes_cmap"])
+                    # edge_cmap = cm.get_cmap("nodes_cmap")
+                    edge_color = edge_cmap(norm(pass_value))
 
-                ax.plot([player1_x, player2_x], [player1_y, player2_y],
-                        'w-', linestyle='-', lw=line_width, zorder=3, color=edge_color, alpha=0.4)
-                
+                    ax.plot([player1_x, player2_x], [player1_y, player2_y],
+                            'w-', linestyle='-', lw=line_width, zorder=3, color=edge_color, alpha=0.4)
+            except KeyError:
+                print("Player not found. Skipping...") 
             # print(line_width)
 
     # Step 2: plot nodes
@@ -200,12 +202,12 @@ def draw_pass_map(ax, player_position,
         num_passes = row["num_passes"]
         pass_value = row["pass_value"]
 
-        if num_passes > 15:
+        if num_passes > 0:
             marker_size = _change_range(num_passes, (0, max_player_count), (config["min_node_size"], config["max_node_size"]))
             norm = Normalize(vmin=0, vmax=max_player_value)
             node_cmap = cm.get_cmap(config["nodes_cmap"])
             node_color = node_cmap(norm(pass_value))
-    
+
             ax.plot(player_x, player_y, '.', color=node_color, markersize=marker_size-5, zorder=5, alpha=0.2)
         # ax.plot(player_x, player_y, '.', color=background_color, markersize=marker_size-20, zorder=6)
         # ax.annotate(player_name, xy=(player_x, player_y), ha="center", va="center", zorder=7,

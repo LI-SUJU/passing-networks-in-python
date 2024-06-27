@@ -5,18 +5,18 @@ from visualization.passing_network import draw_pitch, draw_pass_map
 import os
 import matplotlib.pyplot as plt
 
-matches_path = "data/eventing/matches/9/281.json"
-team_id = 904
-team_name = "Bayer Leverkusen"
-match_ids = []
+# matches_path = "data/eventing/matches/9/281.json"
+# team_id = 904
+# team_name = "Bayer Leverkusen"
+# match_ids = []
 
-with open(matches_path, 'r') as file:
-    match_data = json.load(file)
-    for match in match_data:
-        home_team_id = match["home_team"]["home_team_id"]
-        away_team_id = match["away_team"]["away_team_id"]
-        if home_team_id == team_id or away_team_id == team_id:
-            match_ids.append(match["match_id"])
+# with open(matches_path, 'r') as file:
+#     match_data = json.load(file)
+#     for match in match_data:
+#         home_team_id = match["home_team"]["home_team_id"]
+#         away_team_id = match["away_team"]["away_team_id"]
+#         if home_team_id == team_id or away_team_id == team_id:
+#             match_ids.append(match["match_id"])
 # print the length of the match_ids
 # print(len(match_ids))
 def draw_plot_for_1_match(match_id, team_name, ax):
@@ -94,10 +94,10 @@ def draw_plot_for_1_match(match_id, team_name, ax):
     # plt.savefig("demo/1.png")
     return ax
 
-ax = draw_pitch()
-for match_id in match_ids:
-    ax = draw_plot_for_1_match(match_id, team_name, ax)
-plt.show()
+# ax = draw_pitch()
+# for match_id in match_ids:
+#     ax = draw_plot_for_1_match(match_id, team_name, ax)
+# plt.show()
 
 def draw_plot_for_1_club(team_id, team_name, matches_path):
     match_ids = []
@@ -112,5 +112,6 @@ def draw_plot_for_1_club(team_id, team_name, matches_path):
     ax = draw_pitch()
     for match_id in match_ids:
         ax = draw_plot_for_1_match(match_id, team_name, ax)
+    print("length of match_ids", len(match_ids))
     plt.show()
 
