@@ -8,12 +8,13 @@ Code borrowed and adapted from https://github.com/ML-KULeuven/socceraction
 @author: Sergio Llana (@SergioMinuto90)
 """
 
-
-import socceraction.classification.features as fs
-import socceraction.classification.labels as lab
+import socceraction.vaep as vaep
+import socceraction.vaep.features as fs
+import socceraction.vaep.labels as lab
 import socceraction.spadl.statsbomb as statsbomb
+from socceraction.data.statsbomb import StatsBombLoader
 import socceraction.spadl as spadl
-
+import socceraction
 import pandas as pd
 import warnings
 import xgboost
@@ -25,11 +26,11 @@ datafolder = "data/eventing"
 
 
 ### NOTEBOOK 1: LOAD AND CONVERT STATSBOMB DATA
-SBL = statsbomb.StatsBombLoader(root=datafolder, getter="local")
+SBL = StatsBombLoader(root=datafolder, getter="local")
 selected_competitions = SBL.competitions()
 
 # Get matches from all selected competitions
-matches = list(SBL.matches(row.competition_id, row.season_id)
+matches = list(SBL.games(row.competition_id, row.season_id)
                for row in selected_competitions.itertuples())
 
 matches = pd.concat(matches, sort=True).reset_index(drop=True)
@@ -38,17 +39,17 @@ matches = pd.concat(matches, sort=True).reset_index(drop=True)
 matches_verbose = tqdm.tqdm(list(matches.itertuples()), desc="Loading match data")
 teams, players, player_games = [], [], []
 actions = {}
-
 for match in matches_verbose:
-    teams.append(SBL.teams(match.match_id))
-    players.append(SBL.players(match.match_id))
-    events = SBL.events(match.match_id)
+    print(match)
+    teams.append(SBL.teams(match.game_id))
+    players.append(SBL.players(match.game_id))
+    events = SBL.events(match.game_id)
 
-    player_games.append(statsbomb.extract_player_games(events))
-    actions[match.match_id] = statsbomb.convert_to_actions(events, match.home_team_id)
+    player_games.append(socceraction.data.statsbomb.extract_player_games(events))
+    actions[match.game_id] = statsbomb.convert_to_actions(events, match.home_team_id)
 
 # Store converted spadl data in a h5-file
-games = matches.rename(columns={"match_id": "game_id"})
+games = matches.rename(columns={"game_id": "game_id"})
 teams = pd.concat(teams, sort=True).drop_duplicates("team_id").reset_index(drop=True)
 players = pd.concat(players, sort=True).drop_duplicates("player_id").reset_index(drop=True)
 player_games = pd.concat(player_games, sort=True).reset_index(drop=True)

@@ -7,7 +7,7 @@ Created on Sun Apr 19 2020
 """
 
 
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 from abc import ABC, abstractmethod
 import socceraction.vaep as vaep
 import pandas as pd
